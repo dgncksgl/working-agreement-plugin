@@ -1,0 +1,14 @@
+{
+  "name": "working-agreement",
+  "description": "Marketplace for the working-agreement plugin",
+  "owner": {
+    "name": "dgncksgl"
+  },
+  "plugins": [
+    {
+      "name": "working-agreement",
+      "source": "./plugins/working-agreement",
+      "description": "Shared working rules for Claude Code, loaded into every session"
+    }
+  ]
+}

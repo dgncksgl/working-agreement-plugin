@@ -1,0 +1,25 @@
+{
+  "description": "Inject the working agreement into every session and every subagent",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat \"${CLAUDE_PLUGIN_ROOT}/rules/working-agreement.md\""
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/subagent-context.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

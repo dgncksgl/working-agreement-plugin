@@ -1,0 +1,11 @@
+{
+  "name": "working-agreement",
+  "description": "Shared working rules for Claude Code, loaded into every session: confidence gate, phased changes, minimal scope, verification.",
+  "author": {
+    "name": "dgncksgl"
+  },
+  "homepage": "https://github.com/dgncksgl/working-agreement-plugin",
+  "repository": "https://github.com/dgncksgl/working-agreement-plugin",
+  "license": "MIT",
+  "keywords": ["rules", "claude-md", "workflow", "session-start"]
+}

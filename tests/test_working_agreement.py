@@ -88,6 +88,18 @@ class HookTest(unittest.TestCase):
             output = json.loads(run_hook("SubagentStart", root))["hookSpecificOutput"]
             self.assertEqual(output["additionalContext"], tricky)
 
+    def test_subagent_start_prints_no_partial_json_when_rules_are_missing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "working-agreement"
+            shutil.copytree(PLUGIN, root)
+            (root / "rules" / "working-agreement.md").unlink()
+            command = load(root / "hooks" / "hooks.json")["hooks"]["SubagentStart"][0]["hooks"][0]["command"]
+            env = {**os.environ, "CLAUDE_PLUGIN_ROOT": str(root)}
+            result = subprocess.run(["sh", "-c", command], env=env, capture_output=True, text=True)
+            self.assertEqual(result.stdout, "")
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("working-agreement.md", result.stderr)
+
     def test_rules_have_a_single_source(self):
         self.assertEqual(sorted(p.name for p in (PLUGIN / "rules").iterdir()), ["working-agreement.md"])
 
@@ -151,9 +163,20 @@ class ReadmeTest(unittest.TestCase):
         plugin = load(PLUGIN / ".claude-plugin" / "plugin.json")["name"]
         self.assertIn(f"/plugin install {plugin}@{marketplace}", self.text)
         self.assertIn(f"claude plugin install {plugin}@{marketplace}", self.text)
-        self.assertIn(f"/plugin marketplace update {marketplace}", self.text)
+        self.assertIn(f"claude plugin update {plugin}@{marketplace}", self.text)
         self.assertIn(f"claude plugin marketplace remove {marketplace}", self.text)
         self.assertIn("marketplace add dgncksgl/working-agreement-plugin", self.text)
+
+    def test_update_section_refreshes_listing_before_updating_plugin(self):
+        # `marketplace update` alone leaves the installed copy on its old commit, and
+        # `plugin update` alone reports "already at the latest version" from the stale listing.
+        marketplace = load(ROOT / ".claude-plugin" / "marketplace.json")["name"]
+        plugin = load(PLUGIN / ".claude-plugin" / "plugin.json")["name"]
+        update = self.text.split("\n## Update\n", 1)[1].split("\n## ", 1)[0]
+        refresh = update.find(f"claude plugin marketplace update {marketplace}\n")
+        install = update.find(f"claude plugin update {plugin}@{marketplace}\n")
+        self.assertNotEqual(refresh, -1)
+        self.assertGreater(install, refresh)
 
     def test_relative_links_exist(self):
         for target in re.findall(r"\]\((?!https?://)([^)#]+)\)", self.text):

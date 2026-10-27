@@ -69,13 +69,18 @@ Claude should answer with `NEVER make a change unless ≥95% confident. Otherwis
 
 ## Update
 
-The plugin has no `version` field, so every new commit counts as an update. To pull it:
+The plugin has no `version` field, so every new commit counts as an update. To pull it, run both commands in your shell, in this order:
 
-```
-/plugin marketplace update working-agreement
+```bash
+claude plugin marketplace update working-agreement
+claude plugin update working-agreement@working-agreement
 ```
 
-To get updates automatically, open `/plugin`, go to **Marketplaces**, select `working-agreement` and choose **Enable auto-update**.
+The first fetches the new commit but leaves the installed copy on the old one. The second installs it. Run alone, the second reports `already at the latest version`, because it compares against the listing it fetched last time.
+
+The new rules load in your next session, or after `/reload-plugins` in a running one.
+
+To get updates automatically, open `/plugin`, go to **Marketplaces**, select `working-agreement` and choose **Enable auto-update**. Claude Code then checks for updates during interactive sessions and installs them in the background; you see `Plugin updated: working-agreement · Run /reload-plugins to apply`.
 
 ## Uninstall
 
